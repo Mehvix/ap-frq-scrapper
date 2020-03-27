@@ -13,7 +13,7 @@ url = input("Enter the \"Past Exam Questions\" URL, e.g.\n"
 # url = "https://apcentral.collegeboard.org/courses/ap-computer-science-a/exam/past-exam-questions"
 base = url.split("/")[:-4]
 base = "/".join(base)
-name = url.strip().split("/")[-3]
+name = url.strip().split("/")[4].split("?")[0]
 print("Downloading", name)
 
 try:
@@ -29,7 +29,8 @@ for div in html.select('div[id="accordion"]'):
     for table in div.select('table'):
 
         # print(table, "\n\n\n===\n\n\n")
-        year = table.select('caption')[0].text.strip().split(":")[0]
+        cap = table.select('caption')
+        year = cap[0].text.strip().split(":")[0]
 
         directory = name + r"\\" + year
         # print(directory)
@@ -39,7 +40,11 @@ for div in html.select('div[id="accordion"]'):
         files = table.select('a')
         for i in files:
             file_name, file_url = i.text, i['href']
-            file_dir = directory + "\\" + file_name + ".pdf"
+            if "Form" in cap:
+                file_dir = directory + "\\Form B " + file_name + ".pdf"
+            else:
+                file_dir = directory + "\\" + file_name + ".pdf"
+
             if "http" not in file_url:
                 file_url = base + file_url
             print("Downloading " + file_url + " to " + file_dir)
@@ -49,11 +54,10 @@ for div in html.select('div[id="accordion"]'):
                 except urllib.error.HTTPError as e:
                     print("wget 404!", file_url, file_dir, str(e))
 
-                    print("Trying with URLLib..")
+                    print("Trying with URLLib...")
                     try:
                         urllib.request.urlretrieve(file_url, file_dir)
                     except:
                         print("URLLib 404!", file_url, file_dir,)
-
             else:
                 print("File exists already!")
