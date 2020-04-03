@@ -40,7 +40,7 @@ for div in html.select('div[id="accordion"]'):
         files = table.select('a')
         for i in files:
             file_name, file_url = i.text, i['href']
-            if "Form" in cap:
+            if "Form" in cap or "form" in cap:
                 file_dir = directory + "\\Form B " + file_name + ".pdf"
             else:
                 file_dir = directory + "\\" + file_name + ".pdf"
